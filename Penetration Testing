@@ -1,0 +1,47 @@
+Record deleted successfully 
+Stack Number
+Username
+Password
+jump
+9
+JEGL-503-M
+4Id49EHR9h39y8V
+10.50.30.19
+
+stack 19
+Ips
+windows 10.50.20.154
+xfreerdp /u:student /v:10.50.20.154 /dynamic-resolution +glyph-cache +clipboard
+Linux 10.50.37.184
+ssh student@10.50.37.184
+student
+password
+
+ssh student@<linops> -X
+ssh student@10.50.30.90 -X
+$ssh -MS tmpjump student@10.50.30.19
+$ssh -S tmp/jump dummy -O forward -D 9050
+$for i in {1..254}; do (ping -c 1 172.16.82.$i | grep "bytes from" &) ; done
+$proxychains nmap [IP Addr, <4th octet>, <4th octet>, <4th octet>] 
+	proxychains nmap -Pn [IP Addr] -T4 -p 21-23,80
+for p in {1..1023}; do(echo>/dev/tcp/10.50.38.90/$p) >/dev/null 2>&1 && echo "$p open"; done 
+OR
+$proxychains nc <ip> 80
+$proxychains nc <ip2> 80
+proxychains nc <ip3> <discovered port>
+ssh -S /tmp/jump <dummy> -O forward -L -1111:192.168.28.100:80
+firefox 127.0.0.1:1111
+$ssh -S /tmp/jump <dummy> -O forward -L -1111:192.168.28.100:80  -L 2222:192.168.28.111.80
+$firefox 127.0.0.1:1111
+$ssh -S /tmp/jump <dummy> -O forward -L -1111:192.168.28.100:80  -L 2222:192.168.28.11.80  -L 4444:192.168.28.11.22
+
+$ssh -MS /tmp/t1 student@127.0.0.1 -p 4444     #<new master socket file>#
+
+#*** to make a correction or delete change forward to cancel***#
+
+#ssh -S /tmp/jump <dummy> -O <cancel> -L -1111:192.168.28.100:80  -L 2222:192.168.28.11.80 #
+
+$ssh -S /tmp/t1 dummy -O forward -L 5555:192.168.50.100:22
+$ssh -MS /tmp/tmp2 <credentials>@127.0.0.1 -p 5555
+
+
