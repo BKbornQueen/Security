@@ -1,0 +1,44 @@
+https://www.exploit-db.com/google-hacking-database
+	Reference the Google Hacking DB for examples of usage of syntax and examples Google Hacking Database to show various items that you can collect via Google Search.
+
+site:<DOMAIN NAME>
+
+    Will return website on following domain
+
+allintitle:<SPECIFIED PHRASE>
+intitle:<SPECIFIED PHRASE>
+
+    Contains a specified phrase that appears in a title tag on a page
+
+inurl:<SPECIFIED PHRASE>
+
+    Restricts the results contained in the URLS to the specified phrase
+
+filetype:<FILE TYPE>
+
+    Searches for specified file type formats.
+
+
+SPECIAL CHARACTERS:
+
+Double apexes “search string”
+
+    Double quotes are used to search for a specific word or a set of words written exactly that way.
+    "gelato"
+
+Minus sign [ -string ]
+
+    The minus sign in front of the word tells Google to exclude that specific word from the search.
+    -cripto
+
+Tilde [ ~string ]
+
+    Specifically, it indicates a Google to search its synonyms over a word.
+    ~car
+
+Operator "OR" | [string OR string_2]
+
+    This logical operator tells Google to look for a word or the other. It can also be used more than once.
+    [monero | serhack]
+
+
