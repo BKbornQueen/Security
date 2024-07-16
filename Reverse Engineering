@@ -1,0 +1,39 @@
+main:
+    mov rax, 16     //16 moved into rax// moving into rax the value of 16
+    push rax        //push value of rax (16) onto stack. RSP is pushed up 8 bytes (64 bits)
+    jmp mem2        //jmp to mem2 memory location
+
+mem1:
+    mov rax, 0      //move 0 (error free) exit code to rax
+                    // moving into rax the value of 0 (executed correctly no errors)
+    ret             //return out of code
+                    // return contents of the return register-which in this case would be zero
+
+mem2:
+    pop r8          //pop value on the stack (16) into r8. RSP falls 8 bytes
+                    // popping the value(16) off of the stack and storing it in r8. RSP(stack pointer falls by 8 bytes)
+    cmp rax, r8     //compare rax register value (16) to r8 register value (16) // causes zero value
+    je mem1         //jump if comparison has zero bit set to mem1
+                    // previos comparison ends with zero flag set; jump to mem1
+
+stack pointers move by 8 bytes when working with 64 bit memory locations
+
+_____________________________________________________________________________________________________________
+
+main:
+    mov rcx, 25     //store the value 25 in rcx register//moving into rcx the value of 25
+    mov rbx, 62     //store the value 62 in rbx register//moving into rbc the value of 62
+    jmp mem1        //jumps to mem1 location
+
+mem1:
+    sub rbx, 40     //subtract 40 from rbx//subtract 40 from the value in rbx(62).Result is rbx=22.
+    mov rsi, rbx    //copy rbx value to rsi//moving into rsi the new value of rbx(22)
+    cmp rcx, rsi    //compare the values in rcx and rsi// compare the rsi value 22 to the rcx value 25// result is a change of 3
+    jmple mem2      //jumps to mem2 location if value is less than or equal// xero flag is not set and RSI<RCX, jump to mem2
+                    // the RSI < RCX is an expected and allowed result so jumping to mem2 is the next move
+                    // this is an OR statement so either result can be true to move to mem2
+
+mem2:
+    mov rax, 0      //store 0 in rax// moving into rax the value of 0// reached this location bc true result out of mem1
+    ret             //return out of code// returns output of zero aka true no errors
+
